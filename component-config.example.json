@@ -1,0 +1,165 @@
+{
+    "loopback-component-explorer": {
+        "mountPath": "/explorer"
+    },
+    "loopback-component-kong-sync": {
+        "appVersion": "APP_VERSION",
+        "adminUrl": "http://admin.kong.local:8001",
+        "apiHost": "api.mywebsite.com",
+        "service": {
+            "name": "SyncService",
+            "retries": 5,
+            "protocol": "http",
+            "host": "SyncUpstream",
+            "port": 80,
+            "path": "/",
+            "connect_timeout": 60000,
+            "write_timeout": 60000,
+            "read_timeout": 60000,
+            "tags": [
+                "SyncService"
+            ]
+        },
+        "upstream": {
+            "name": "SyncUpstream",
+            "hash_on": "none",
+            "hash_fallback": "none",
+            "slots": 10000,
+            "healthchecks": {
+                "active": {
+                    "https_verify_certificate": false,
+                    "unhealthy": {
+                        "http_statuses": [429, 404, 500, 501, 502, 503, 504, 505],
+                        "timeouts": 2,
+                        "http_failures": 2,
+                        "interval": 100
+                    },
+                    "http_path": "/",
+                    "timeout": 1,
+                    "healthy": {
+                        "http_statuses": [200, 301, 302, 307],
+                        "interval": 5,
+                        "successes": 2
+                    },
+                    "concurrency": 10,
+                    "type": "http"
+                }
+            },
+            "tags": [
+                "SyncUpstream",
+                "SyncService"
+            ]
+        },
+        "targets": [
+            {
+                "target": "127.0.0.1:3001",
+                "weight": 100,
+                "tags": [
+                    "SyncTarget",
+                    "SyncUpstream",
+                    "SyncService"
+                ]
+            },
+            {
+                "target": null,
+                "weight": 100,
+                "tags": [
+                    "SyncTarget",
+                    "SyncUpstream",
+                    "SyncService"
+                ]
+            }
+        ],
+        "plugins": {
+            "service": {
+                "cors": {
+                    "name": "cors",
+                    "service": null,
+                    "route": null,
+                    "enabled": true,
+                    "run_on": "first",
+                    "protocols": ["http", "https"],
+                    "tags": [
+                        "SyncService",
+                        "cors"
+                    ],
+                    "config": {
+                        "origins": [
+                            "https://www.mywebsite.com",
+                            "https://mywebsite.com"
+                        ],
+                        "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"],
+                        "headers": [
+                            "Origin",
+                            "Referer",
+                            "Authorization",
+                            "Accepts",
+                            "Content-Length",
+                            "Content-Type",
+                            "User-Agent",
+                            "Host",
+                            "Connection",
+                            "Accept-Language",
+                            "Accept-Encoding",
+                            "Accept-Charset"
+                        ],
+                        "exposed_headers": [
+                            "User-Agent",
+                            "Access-Control-Allow-Origin"
+                        ],
+                        "credentials": true,
+                        "max_age": 3600,
+                        "preflight_continue": true
+                    }
+                }
+            },
+            "route": {
+                "key-auth": {
+                    "name": "key-auth",
+                    "service": null,
+                    "route": null,
+                    "enabled": true,
+                    "run_on": "first",
+                    "protocols": ["http", "https"],
+                    "tags": [
+                        "SyncRoute",
+                        "key-auth"
+                    ],
+                    "config": {
+                        "key_names": ["authorization","Authorization"],
+                        "key_in_body": false,
+                        "hide_credentials": false,
+                        "anonymous": null,
+                        "run_on_preflight": false
+                    }
+                }
+            }
+        },
+        "authentication": {
+            "simultaneousSessions": 5,
+            "loginMethods": [
+                "/users/login",
+                "/users/create",
+                "/users/confirm",
+                "/users/verify"
+            ],
+            "logoutMethods": [
+                "/users/logout"
+            ]
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
