@@ -913,6 +913,25 @@ module.exports = function(loopbackApplication, options) {
 
     }
 
+    function syncKongLogout(accessToken, next) {
+
+        debug('syncKongLogout: ', accessToken);
+
+        kongClient.consumer.deleteKeyAuthCredentials(accessToken.userId, accessToken.id, function(err, deleted) {
+
+            if (err) {
+                console.error(err);
+                return next(errorFormat(401, 'SYNCKONG_SYNC_FAILED', 'Login failed'));
+            }
+
+            debug('deleted: ', deleted);
+
+            next();
+
+        });
+
+    }
+
     function syncKongCredentials(consumer, accessToken, next) {
 
         debug('Sync Credentials for consumer: ', consumer);
@@ -988,15 +1007,14 @@ module.exports = function(loopbackApplication, options) {
 
             syncKongLogin(ctx.result, next);
 
-        } else if(logoutMethods.indexOf(ctx.req.originalUrl) > -1 && ctx.result && ctx.result.id) {
+        } else if(logoutMethods.indexOf(ctx.req.originalUrl) > -1 && ctx.req && ctx.req.accessToken && ctx.req.accessToken.id) {
 
-            syncKongLogout(ctx.result, next);
+            syncKongLogout(ctx.req.accessToken, next);
 
         } else {
             next();
         }
 
-        //next();
     });
 
     function errorFormat(status, code, message) {
