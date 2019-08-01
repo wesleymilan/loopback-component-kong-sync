@@ -742,8 +742,6 @@ module.exports = function(loopbackApplication, options) {
                     if (methods[0] === 'ALL') methods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"];
                     else methods.push("OPTIONS");
 
-                    console.log(model[method].http);
-
                     let basePath = apiVersion + model[method].modelPath + loopbackConvertPath(model[method].http.path);
                     basePath = '/' + basePath.split('/').filter(function(el) { return el; }).join('/');
                     let paths = [
@@ -839,6 +837,8 @@ module.exports = function(loopbackApplication, options) {
     }
 
     function loopbackConvertPath(path) {
+
+        //if(!path) return null;
 
         let splittedPath = path.split('/');
 
