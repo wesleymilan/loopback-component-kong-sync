@@ -152,8 +152,6 @@ module.exports = function(loopbackApplication, options) {
 
                     debug('Create Plugin: ', item);
 
-                    console.log('Create Plugin: ', item);
-
                     kongClient.plugin.create(item, function (err, created) {
 
                         if (err) console.error(err);
