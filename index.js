@@ -613,7 +613,7 @@ module.exports = function(loopbackApplication, options) {
 
                         if (err) {
                             console.error(err);
-                            return cb(err);
+                            return cb();
                         }
 
                         debug('Target deleted');
@@ -651,58 +651,40 @@ module.exports = function(loopbackApplication, options) {
 
             item.upstream = options.upstream.name;
 
-            /* If no target host:port was specified we get the current machine IP and Loopback configured port */
+            // If no target host:port was specified we get the current machine IP and Loopback configured port
             if(!item.target) {
                 debug('Getting IP for target: ', item);
                 item.target = ip.address() + ':' + lbConfig.port;
             }
 
-            /* If this host is already on Kong with a valid checksum skip create target */
+            // If this host is already on Kong with a valid checksum skip create target
             if(createIgnore.indexOf(item.target) > -1) {
-
                 debug('Ignoring target: ', item);
-
-                setTargetHealthy(item, function(err, healthy) {
-
-                    if(err) return cb(err);
-
-                    cb();
-
-                });
-
-            } else {
-
-                /* Add Service checksum to be evaluated on the next deploy */
-                item.tags.push(options.checksum.upstream);
-
-                debug('Creating target: ', item);
-
-                kongClient.target.create(item, function(err, target) {
-
-                    if(err) {
-                        return cb(err);
-                    }
-
-                    debug('Kong Target Created: ', target);
-
-                    setTargetHealthy(item, function(err, healthy) {
-
-                        if(err) return cb(err);
-
-                        cb();
-
-                    });
-
-                });
-
+                return setTargetHealthy(item, cb);
             }
+
+            // Add Service checksum to be evaluated on the next deploy
+            item.tags.push(options.checksum.upstream);
+
+            debug('Creating target: ', item);
+
+            kongClient.target.create(item, function(err, target) {
+
+                if(err) {
+                    console.error(err);
+                    return cb();
+                }
+
+                debug('Kong Target Created: ', target);
+
+                return setTargetHealthy(item, cb);
+
+            });
 
         }, function(err) {
 
-            /*
-            This is a runtime error, we cannot stop the API startup process at this point, just log the error
-            on console and monitor
-            */
+            // This is a runtime error, we cannot stop the API startup process at this point, just log the error
+            // on console and monitor
             if(err) console.error(err);
 
             cb();
@@ -718,7 +700,8 @@ module.exports = function(loopbackApplication, options) {
         kongClient.target.setHealthy(target.upstream, target.target, function(err, healthy) {
 
             if(err) {
-                return cb(err);
+                console.error(err);
+                return cb();
             }
 
             debug('Target is now Healthy: ', healthy);
