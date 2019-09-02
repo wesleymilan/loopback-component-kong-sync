@@ -73,9 +73,7 @@ module.exports = function(loopbackApplication, options) {
 
                     syncRoutes(function(err) {
 
-                        if(err) {
-                            return cb(err);
-                        }
+                        if(err) return cb(err);
 
                         cb();
 
@@ -554,7 +552,15 @@ module.exports = function(loopbackApplication, options) {
 
             options.checksum.upstream = checksum(JSON.stringify(options.upstream) + appVersion);
 
-            if(!upstream || upstream.tags.indexOf(options.checksum.upstream) === -1) {
+            if(upstream && upstream.tags.indexOf(options.checksum.upstream) > -1) {
+
+                options.upstream = upstream;
+
+                debug('Kong Upstream Found: ', upstream);
+
+                cb();
+
+            } else {
 
                 debug('Kong Upstream Not Synced: ', upstream);
 
@@ -575,14 +581,6 @@ module.exports = function(loopbackApplication, options) {
                     cb();
 
                 });
-
-            } else {
-
-                options.upstream = upstream;
-
-                debug('Kong Upstream Found: ', upstream);
-
-                cb();
 
             }
 
