@@ -749,7 +749,7 @@ module.exports = function(loopbackApplication, options) {
                         basePath + '/'
                     ];
 
-                    routes.push({
+                    let routeData = {
                         "name": m + '-' + model[method].name,
                         "protocols": [options.service.protocol],
                         "methods": methods,
@@ -760,7 +760,11 @@ module.exports = function(loopbackApplication, options) {
                         "preserve_host": true,
                         "tags": [options.service.name, options.upstream.name, m, model[method].name],
                         "plugins": kongBuildRoutePlugins(m, method)
-                    });
+                    };
+
+                    console.log('routeData: ', routeData);
+
+                    routes.push(routeData);
 
                 }
 
