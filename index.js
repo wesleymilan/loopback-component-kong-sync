@@ -753,7 +753,7 @@ module.exports = function(loopbackApplication, options) {
                         "name": m + '-' + model[method].name,
                         "protocols": [options.service.protocol],
                         "methods": methods,
-                        "hosts": [options.apiHost],
+                        "hosts": options.apiHost,
                         "paths": paths,
                         "regex_priority": 0,
                         "strip_path": false,
