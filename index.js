@@ -59,26 +59,31 @@ module.exports = function(loopbackApplication, options) {
 
     function syncKong(cb) {
 
-        async.parallel([
-            function(cb) {
+        syncUpstream(function(err) {
+
+            if(err) return cb(err);
+
+            syncTarget(function(err) {
+
+                if(err) return cb(err);
+
                 syncService(function(err) {
-                    if(err) return cb(err);
-                    syncRoutes(cb);
-                });
-            },
-            function(cb) {
-                syncUpstream(function(err) {
-                    if(err) return cb(err);
-                    syncTarget(cb);
-                });
-            }
-        ], function(err) {
 
-            if(err) {
-                return cb(err);
-            }
+                    if(err) return cb(err);
 
-            cb();
+                    syncRoutes(function(err) {
+
+                        if(err) {
+                            return cb(err);
+                        }
+
+                        cb();
+
+                    });
+
+                });
+
+            });
 
         });
 
@@ -761,8 +766,6 @@ module.exports = function(loopbackApplication, options) {
                         "tags": [options.service.name, options.upstream.name, m, model[method].name],
                         "plugins": kongBuildRoutePlugins(m, method)
                     };
-
-                    console.log('routeData: ', routeData);
 
                     routes.push(routeData);
 
