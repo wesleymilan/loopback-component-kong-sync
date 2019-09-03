@@ -556,7 +556,7 @@ module.exports = function(loopbackApplication, options) {
 
                 options.upstream = upstream;
 
-                debug('Kong Upstream Found: ', upstream);
+                debug('Kong Upstream Found: ', options.upstream);
 
                 cb();
 
@@ -566,17 +566,17 @@ module.exports = function(loopbackApplication, options) {
 
                 options.upstream.tags.push(options.checksum.upstream);
 
-                kongClient.upstream.updateOrCreate(options.upstream, function(err, upstream) {
+                kongClient.upstream.updateOrCreate(options.upstream, function(err, created) {
 
                     if(err) {
                         return cb(err);
                     }
 
-                    if(!upstream) return cb(new Error('No upstream created'));
+                    if(!created) return cb(new Error('No upstream created'));
 
-                    options.upstream = upstream;
+                    options.upstream = created;
 
-                    debug('Kong Upstream Created: ', upstream);
+                    debug('Kong Upstream Created: ', options.upstream);
 
                     cb();
 
