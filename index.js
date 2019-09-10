@@ -922,7 +922,7 @@ module.exports = function(loopbackApplication, options) {
 
     function syncKongLogout(accessToken, next) {
 
-        debug('syncKongLogout: ', accessToken);
+        console.log('syncKongLogout: ', accessToken);
 
         kongClient.consumer.deleteKeyAuthCredentials(accessToken.userId, accessToken.id, function(err, deleted) {
 
@@ -955,19 +955,15 @@ module.exports = function(loopbackApplication, options) {
                 return createKongCredentials(consumer, accessToken, next);
             }
 
-            debug('Number of Previous Keys on Kong: ', keys.data.length);
-
             let expiration = new Date();
-            expiration.setSeconds(expiration.getSeconds()-accessToken.ttl);
-            expiration = expiration.getMilliseconds();
+            expiration.setSeconds(expiration.getSeconds() - parseInt(accessToken.ttl));
+            expiration = Math.floor(expiration.getTime() / 1000);
 
             let credentialsCount = 0;
 
             async.eachSeries(keys.data, function(item, cb) {
 
-                debug('Credential: ', item);
-
-                if(item.created > expiration && credentialsCount < options.authentication.simultaneousSessions) {
+                if(item.created_at > expiration && credentialsCount < options.authentication.simultaneousSessions) {
                     debug('Valid credential');
                     credentialsCount++;
                     return cb();
