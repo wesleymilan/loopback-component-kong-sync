@@ -73,7 +73,7 @@ module.exports = function(loopbackApplication, options) {
 
             function(cb) {
 
-                if(instanceOptions.sync.indexOf(upstreams) === -1) {
+                if(instanceOptions.sync.indexOf('upstreams') === -1) {
                     console.log('Skipping Kong Sync UPSTREAMS');
                     return cb();
                 }
@@ -91,7 +91,7 @@ module.exports = function(loopbackApplication, options) {
             },
             function(cb) {
 
-                if(instanceOptions.sync.indexOf(targets) === -1) {
+                if(instanceOptions.sync.indexOf('targets') === -1) {
                     console.log('Skipping Kong Sync TARGETS');
                     return cb();
                 }
@@ -109,7 +109,7 @@ module.exports = function(loopbackApplication, options) {
             },
             function(cb) {
 
-                if(instanceOptions.sync.indexOf(services) === -1) {
+                if(instanceOptions.sync.indexOf('services') === -1) {
                     console.log('Skipping Kong Sync SERVICES');
                     return cb();
                 }
@@ -127,7 +127,7 @@ module.exports = function(loopbackApplication, options) {
             },
             function(cb) {
 
-                if(instanceOptions.sync.indexOf(routes) === -1) {
+                if(instanceOptions.sync.indexOf('routes') === -1) {
                     console.log('Skipping Kong Sync ROUTES');
                     return cb();
                 }
