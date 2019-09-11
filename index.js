@@ -671,7 +671,7 @@ module.exports = function(loopbackApplication, options) {
 
             options.upstream = upstream;
 
-            cb(null, upstream.id);
+            cb(null, upstream);
 
         });
 
@@ -684,7 +684,7 @@ module.exports = function(loopbackApplication, options) {
         getUpstream(function(err, upstream) {
 
             if(err) return cb(err);
-
+            
             kongClient.target.list(upstream.id, null, function(err, targets) {
 
                 if(err) {
