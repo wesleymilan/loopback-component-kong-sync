@@ -51,6 +51,8 @@ module.exports = function(loopbackApplication, options) {
 
         buildSessionMethods();
 
+        console.log('Delaying Kong Sync ' + instanceOptions.delay + 's');
+
         setTimeout(function() {
 
             syncKong(function(err) {
@@ -71,7 +73,12 @@ module.exports = function(loopbackApplication, options) {
 
             function(cb) {
 
-                if(!instanceOptions.sync.upstreams) return cb();
+                if(!instanceOptions.sync.upstreams) {
+                    console.log('Skipping Kong Sync UPSTREAMS');
+                    return cb();
+                }
+
+                console.log('Syncing Kong UPSTREAMS');
 
                 syncUpstream(function(err) {
 
@@ -84,7 +91,12 @@ module.exports = function(loopbackApplication, options) {
             },
             function(cb) {
 
-                if(!instanceOptions.sync.targets) return cb();
+                if(!instanceOptions.sync.targets) {
+                    console.log('Skipping Kong Sync TARGETS');
+                    return cb();
+                }
+
+                console.log('Syncing Kong TARGETS');
 
                 syncTarget(function(err) {
 
@@ -97,7 +109,12 @@ module.exports = function(loopbackApplication, options) {
             },
             function(cb) {
 
-                if(!instanceOptions.sync.services) return cb();
+                if(!instanceOptions.sync.services) {
+                    console.log('Skipping Kong Sync SERVICES');
+                    return cb();
+                }
+
+                console.log('Syncing Kong SERVICES');
 
                 syncService(function(err) {
 
@@ -110,7 +127,12 @@ module.exports = function(loopbackApplication, options) {
             },
             function(cb) {
 
-                if(!instanceOptions.sync.routes) return cb();
+                if(!instanceOptions.sync.routes) {
+                    console.log('Skipping Kong Sync ROUTES');
+                    return cb();
+                }
+
+                console.log('Syncing Kong ROUTES');
 
                 syncRoutes(function(err) {
 
