@@ -13,9 +13,12 @@ const lbConfig = loopback.getConfig();
 
 module.exports = function(loopbackApplication, options) {
 
-    let modelsDefinition, kongClient, appVersion, userModel, loginMethods, logoutMethods;
+    let modelsDefinition, kongClient, appVersion, userModel, loginMethods, logoutMethods, instanceOptions;
 
     function init() {
+
+        if(!options.instances[process.env.INSTANCE]) return;
+        instanceOptions = options.instances[process.env.INSTANCE];
 
         // Check required params
         if(!options.adminUrl) throw new Error('adminUrl is required for Loopback Component Kong Sync');
@@ -47,41 +50,83 @@ module.exports = function(loopbackApplication, options) {
         options.checksum = {};
 
         buildSessionMethods();
-        syncKong(function(err) {
-            if(err) {
-                if(process.env.DEBUG !== 'loopback:component:kong:sync') console.error('An error occurred, for more details use "DEBUG=loopback:component:kong:sync node ."');
-                else console.error(err);
-            }
-            else console.log('Services synced');
-        });
+
+        setTimeout(function() {
+
+            syncKong(function(err) {
+                if(err) {
+                    if(process.env.DEBUG !== 'loopback:component:kong:sync') console.error('An error occurred, for more details use "DEBUG=loopback:component:kong:sync node ."');
+                    else console.error(err);
+                }
+                else console.log('Services synced');
+            });
+
+        }, instanceOptions.delay * 1000);
 
     }
 
     function syncKong(cb) {
 
-        syncUpstream(function(err) {
+        async.series([
 
-            if(err) return cb(err);
+            function(cb) {
 
-            syncTarget(function(err) {
+                if(!instanceOptions.sync.upstreams) return cb();
 
-                if(err) return cb(err);
+                syncUpstream(function(err) {
 
-                syncService(function(err) {
+                    if (err) return cb(err);
 
-                    if(err) return cb(err);
-
-                    syncRoutes(function(err) {
-
-                        if(err) return cb(err);
-
-                        cb();
-
-                    });
+                    cb();
 
                 });
 
-            });
+            },
+            function(cb) {
+
+                if(!instanceOptions.sync.targets) return cb();
+
+                syncTarget(function(err) {
+
+                    if (err) return cb(err);
+
+                    cb();
+
+                });
+
+            },
+            function(cb) {
+
+                if(!instanceOptions.sync.services) return cb();
+
+                syncService(function(err) {
+
+                    if (err) return cb(err);
+
+                    cb();
+
+                });
+
+            },
+            function(cb) {
+
+                if(!instanceOptions.sync.routes) return cb();
+
+                syncRoutes(function(err) {
+
+                    if(err) return cb(err);
+
+                    cb();
+
+                });
+
+            }
+
+        ], function(err) {
+
+            if(err) return cb(err);
+
+            cb();
 
         });
 
