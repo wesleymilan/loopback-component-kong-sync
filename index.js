@@ -655,59 +655,87 @@ module.exports = function(loopbackApplication, options) {
 
     }
 
+    function getUpstream(cb) {
+
+        if(options.upstream.id) return cb(null, options.upstream.id);
+
+        kongClient.upstream.get(options.upstream.name, function(err, upstream) {
+
+            if(err) {
+                return cb(err);
+            }
+
+            options.checksum.upstream = checksum(JSON.stringify(options.upstream) + appVersion);
+
+            if(!upstream) return cb(new Error('No upstream found on kong'));
+
+            options.upstream = upstream;
+
+            cb(null, upstream.id);
+
+        });
+
+    }
+
     function syncTarget(cb) {
 
         debug('Syncing target...');
 
-        kongClient.target.list(options.upstream.id, null, function(err, targets) {
+        getUpstream(function(err, upstream) {
 
-            if(err) {
-                // This is a runtime error, we cannot stop the API startup process at this point, just log the error
-                // on console and monitor
-                console.error(err);
+            if(err) return cb(err);
 
-                return cb();
-            }
+            kongClient.target.list(upstream.id, null, function(err, targets) {
 
-            debug('Found targets: ', targets);
+                if(err) {
+                    // This is a runtime error, we cannot stop the API startup process at this point, just log the error
+                    // on console and monitor
+                    console.error(err);
 
-            let createIgnore = [];
-
-            async.eachSeries(targets.data, function(item, cb) {
-
-                if(item.tags.indexOf(options.checksum.upstream) === -1) {
-
-                    debug('Deleting target: ', item);
-
-                    kongClient.target.delete(options.upstream.name, item.id, function(err, deleted) {
-
-                        if (err) {
-                            console.error(err);
-                            return cb();
-                        }
-
-                        debug('Target deleted');
-
-                        cb();
-
-                    });
-
-                } else {
-
-                    debug('Valid target: ', item);
-
-                    createIgnore.push(item.target);
-
-                    cb();
+                    return cb();
                 }
 
-            }, function(err) {
+                debug('Found targets: ', targets);
 
-                // This is a runtime error, we cannot stop the API startup process at this point, just log the error
-                // on console and monitor
-                if(err) console.error(err);
+                let createIgnore = [];
 
-                createTargets(createIgnore, cb);
+                async.eachSeries(targets.data, function(item, cb) {
+
+                    if(item.tags.indexOf(options.checksum.upstream) === -1) {
+
+                        debug('Deleting target: ', item);
+
+                        kongClient.target.delete(upstream.name, item.id, function(err, deleted) {
+
+                            if (err) {
+                                console.error(err);
+                                return cb();
+                            }
+
+                            debug('Target deleted');
+
+                            cb();
+
+                        });
+
+                    } else {
+
+                        debug('Valid target: ', item);
+
+                        createIgnore.push(item.target);
+
+                        cb();
+                    }
+
+                }, function(err) {
+
+                    // This is a runtime error, we cannot stop the API startup process at this point, just log the error
+                    // on console and monitor
+                    if(err) console.error(err);
+
+                    createTargets(createIgnore, cb);
+
+                });
 
             });
 
