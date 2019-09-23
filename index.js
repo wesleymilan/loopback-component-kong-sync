@@ -657,7 +657,7 @@ module.exports = function(loopbackApplication, options) {
 
     function getUpstream(cb) {
 
-        if(options.upstream.id) return cb(null, options.upstream.id);
+        if(options.upstream) return cb(null, options.upstream);
 
         kongClient.upstream.get(options.upstream.name, function(err, upstream) {
 
@@ -679,12 +679,14 @@ module.exports = function(loopbackApplication, options) {
 
     function syncTarget(cb) {
 
-        debug('Syncing target...');
+        debug('Syncing targets...');
 
         getUpstream(function(err, upstream) {
 
             if(err) return cb(err);
-            
+
+            debug('Syncing targets for upstream ' + upstream + '...');
+
             kongClient.target.list(upstream.id, null, function(err, targets) {
 
                 if(err) {
