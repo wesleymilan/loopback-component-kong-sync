@@ -657,7 +657,7 @@ module.exports = function(loopbackApplication, options) {
 
     function getUpstream(cb) {
 
-        if(options.upstream) return cb(null, options.upstream);
+        if(options.upstream && options.upstream.id) return cb(null, options.upstream);
 
         kongClient.upstream.get(options.upstream.name, function(err, upstream) {
 
