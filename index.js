@@ -685,7 +685,7 @@ module.exports = function(loopbackApplication, options) {
 
             if(err) return cb(err);
 
-            debug('Syncing targets for upstream ' + upstream + '...');
+            debug('Syncing targets for upstream ' + JSON.stringify(upstream) + '...');
 
             kongClient.target.list(upstream.id, null, function(err, targets) {
 
