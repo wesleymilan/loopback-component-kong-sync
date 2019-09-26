@@ -697,6 +697,8 @@ module.exports = function(loopbackApplication, options) {
                     return cb();
                 }
 
+                if(!targets) targets = {};
+
                 debug('Found targets: ', targets);
 
                 let createIgnore = [];
