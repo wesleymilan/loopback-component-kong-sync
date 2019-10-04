@@ -1,9 +1,30 @@
 {
   "name": "loopback-component-kong-sync",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Sync Loopback JS API with Kong",
-  "main": "index.js",
+  "homepage": "https://github.com/wesleymilan/loopback-component-kong-sync",
   "author": "Wesley Milan",
+  "engines": {
+    "node": ">=10"
+  },
+  "keywords": [
+    "NodeJS",
+    "kong",
+    "loopback",
+    "express",
+    "api",
+    "sync",
+    "component",
+    "middleware"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wesleymilan/loopback-component-kong-sync"
+  },
+  "bugs": {
+    "url": "https://github.com/wesleymilan/loopback-component-kong-sync/issues"
+  },
+  "main": "index.js",
   "license": "MIT",
   "dependencies": {
     "async": "^2.6.2",
@@ -12,3 +33,5 @@
     "node-kong-admin": "^1.0.0"
   }
 }
+
+
