@@ -237,7 +237,7 @@ module.exports = function(loopbackApplication, options) {
                     item.id = oldPlugins[item.name].id;
 
                     debug('Update Plugin: ', item);
-                    
+
                     kongClient.plugin.update(item, function (err, updated) {
 
                         if (err) console.error(err);
