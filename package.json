@@ -1,6 +1,6 @@
 {
   "name": "loopback-component-kong-sync",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Sync Loopback JS API with Kong",
   "homepage": "https://github.com/wesleymilan/loopback-component-kong-sync",
   "author": "Wesley Milan",
