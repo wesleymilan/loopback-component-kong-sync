@@ -17,7 +17,7 @@ related routes in Kong.
 
 #### Setup
 Installing using npm:
-`npm install git+https://github.com/wesleymilan/node-kong-admin.git --save`
+`npm install loopback-component-kong-sync --save`
 
 After installing it on your project folder you have to input your preferences on 
 `component-config.json`
