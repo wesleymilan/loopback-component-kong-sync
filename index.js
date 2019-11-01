@@ -238,8 +238,6 @@ module.exports = function(loopbackApplication, options) {
 
                     debug('Update Plugin: ', item);
 
-                    console.log('Update Plugin: ', item);
-
                     kongClient.plugin.update(item, function (err, updated) {
 
                         if (err) console.error(err);
@@ -346,11 +344,7 @@ module.exports = function(loopbackApplication, options) {
 
             debug('Iterate new routes: ');
 
-            //console.log('Routes: ', options.routes);
-
             async.eachSeries(options.routes, function(item, cb) {
-
-                //console.log('item.name: ', item.name);
 
                 debug('New Route: ', item);
 
@@ -362,8 +356,6 @@ module.exports = function(loopbackApplication, options) {
                 let routeChecksum = checksum(JSON.stringify(item) + JSON.stringify(plugins) + appVersion);
 
                 item.tags.push(routeChecksum);
-
-                //if(item.name === 'Reserve-listReserves') console.log(options.oldRoutes[item.name].tags, routeChecksum);
 
                 if(!options.oldRoutes[item.name] || options.oldRoutes[item.name].tags.indexOf(routeChecksum) === -1) {
 
@@ -1105,16 +1097,28 @@ module.exports = function(loopbackApplication, options) {
 
     loopbackApplication.remotes().after('**', (ctx, next) => {
 
-        if(loginMethods.indexOf(ctx.req.originalUrl) > -1 && ctx.result && ctx.result.id) {
+        let url = ctx.req.originalUrl.split('?')[0];
+
+        debug('After **: ', url, JSON.stringify(loginMethods));
+
+        if(loginMethods.indexOf(url) > -1 && ctx.result && ctx.result.id) {
+
+            debug('After **: calling syncKongLogin', JSON.stringify(ctx.result, null, 2));
 
             syncKongLogin(ctx.result, next);
 
         } else if(logoutMethods.indexOf(ctx.req.originalUrl) > -1 && ctx.req && ctx.req.accessToken && ctx.req.accessToken.id) {
 
+            debug('After **: calling syncKongLogout', JSON.stringify(ctx.req.accessToken, null, 2));
+
             syncKongLogout(ctx.req.accessToken, next);
 
         } else {
+
+            debug('After **: Next()');
+
             next();
+
         }
 
     });
