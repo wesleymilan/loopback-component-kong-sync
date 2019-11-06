@@ -1013,7 +1013,7 @@ module.exports = function(loopbackApplication, options) {
 
     function syncKongLogout(accessToken, next) {
 
-        console.log('syncKongLogout: ', accessToken);
+        debug('syncKongLogout: ', accessToken);
 
         kongClient.consumer.deleteKeyAuthCredentials(accessToken.userId, accessToken.id, function(err, deleted) {
 
