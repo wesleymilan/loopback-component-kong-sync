@@ -844,7 +844,7 @@ module.exports = function(loopbackApplication, options) {
                     ];
 
                     let routeData = {
-                        "name": m + '-' + model[method].name,
+                        "name": m + '-' + model[method].name + '-' + options.service.name,
                         "protocols": [options.service.protocol],
                         "methods": methods,
                         "hosts": options.apiHost,
